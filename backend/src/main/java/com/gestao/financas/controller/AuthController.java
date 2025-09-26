@@ -2,6 +2,7 @@ package com.gestao.financas.controller;
 
 import com.gestao.financas.Entity.User;
 import com.gestao.financas.dto.LoginDTO;
+import com.gestao.financas.service.PasswordService;
 import com.gestao.financas.service.UserService;
 
 import jakarta.validation.Valid;
@@ -20,6 +21,9 @@ public class AuthController {
     private UserService userService;
 
     @Autowired
+    private PasswordService passwordService;
+
+    @Autowired
     private AuthenticationManager authManager;
 
     @PostMapping("/register")
@@ -32,5 +36,18 @@ public class AuthController {
         Authentication auth = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword()));
         return ResponseEntity.ok("Login efetuado com sucesso para: " + auth.getName());
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
+        passwordService.createPasswordResetToken(email); // ✅ chamada na instância
+        return ResponseEntity.ok("Email de redefinição enviado");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestParam String token,
+            @RequestParam String newPassword) {
+        passwordService.resetPassword(token, newPassword); // ✅ chamada na instância
+        return ResponseEntity.ok("Senha redefinida com sucesso");
     }
 }
