@@ -1,6 +1,6 @@
 package com.gestao.financas.service;
 
-import com.gestao.financas.Entity.User;
+import com.gestao.financas.entity.User;
 import com.gestao.financas.repository.UserRepository;
 
 import java.util.Optional;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
+
     @Autowired
     private UserRepository repository;
 
@@ -24,5 +25,10 @@ public class UserService {
 
     public Optional<User> findByUsername(String username) {
         return repository.findByUsername(username);
+    }
+
+    public User getUserById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
 }

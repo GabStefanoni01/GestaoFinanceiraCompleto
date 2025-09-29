@@ -1,7 +1,7 @@
 package com.gestao.financas.service;
 
-import com.gestao.financas.Entity.User;
-import com.gestao.financas.Entity.VerificationToken;
+import com.gestao.financas.entity.User;
+import com.gestao.financas.entity.VerificationToken;
 import com.gestao.financas.repository.UserRepository;
 import com.gestao.financas.repository.VerificationTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;

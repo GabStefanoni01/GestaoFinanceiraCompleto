@@ -2,8 +2,8 @@ package com.gestao.financas.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.gestao.financas.Entity.PasswordResetToken;
-import com.gestao.financas.Entity.User;
+import com.gestao.financas.entity.PasswordResetToken;
+import com.gestao.financas.entity.User;
 
 import java.util.Optional;
 

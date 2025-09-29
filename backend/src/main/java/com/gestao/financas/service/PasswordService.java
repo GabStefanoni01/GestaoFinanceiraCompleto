@@ -1,7 +1,7 @@
 package com.gestao.financas.service;
 
-import com.gestao.financas.Entity.PasswordResetToken;
-import com.gestao.financas.Entity.User;
+import com.gestao.financas.entity.PasswordResetToken;
+import com.gestao.financas.entity.User;
 import com.gestao.financas.repository.PasswordResetTokenRepository;
 import com.gestao.financas.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

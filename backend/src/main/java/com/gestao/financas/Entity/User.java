@@ -1,4 +1,4 @@
-package com.gestao.financas.Entity; // use o pacote em minúsculo
+package com.gestao.financas.entity; // use o pacote em minúsculo
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;

@@ -1,4 +1,4 @@
-package com.gestao.financas.Entity;
+package com.gestao.financas.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

@@ -1,7 +1,7 @@
 package com.gestao.financas.controller;
 
-import com.gestao.financas.Entity.User;
 import com.gestao.financas.dto.LoginDTO;
+import com.gestao.financas.entity.User;
 import com.gestao.financas.service.PasswordService;
 import com.gestao.financas.service.UserService;
 import com.gestao.financas.service.VerificationService;
