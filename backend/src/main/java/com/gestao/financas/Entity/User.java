@@ -1,4 +1,4 @@
-package com.gestao.financas.Entity;
+package com.gestao.financas.Entity; // use o pacote em minúsculo
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 @Entity
 @Table(name = "users")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,7 +25,14 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    // getters e setters
+    /**
+     * Indica se a conta foi verificada por e-mail.
+     * Padrão: false até o usuário confirmar o registro.
+     */
+    @Column(nullable = false)
+    private boolean enabled = false;
+
+    // ===== Getters e Setters =====
     public Long getId() {
         return id;
     }
@@ -55,5 +63,13 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

@@ -4,6 +4,7 @@ import com.gestao.financas.Entity.User;
 import com.gestao.financas.dto.LoginDTO;
 import com.gestao.financas.service.PasswordService;
 import com.gestao.financas.service.UserService;
+import com.gestao.financas.service.VerificationService;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class AuthController {
     private PasswordService passwordService;
 
     @Autowired
+    private VerificationService verificationService; // ✅ injeta o serviço corretamente
+
+    @Autowired
     private AuthenticationManager authManager;
 
     @PostMapping("/register")
@@ -40,14 +44,22 @@ public class AuthController {
 
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestParam String email) {
-        passwordService.createPasswordResetToken(email); // ✅ chamada na instância
+        passwordService.createPasswordResetToken(email);
         return ResponseEntity.ok("Email de redefinição enviado");
     }
 
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestParam String token,
-            @RequestParam String newPassword) {
-        passwordService.resetPassword(token, newPassword); // ✅ chamada na instância
+                                                @RequestParam String newPassword) {
+        passwordService.resetPassword(token, newPassword);
         return ResponseEntity.ok("Senha redefinida com sucesso");
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<String> verifyEmail(@RequestParam String token) {
+        boolean ok = verificationService.verifyUser(token); // ✅ uso de instância
+        return ok
+            ? ResponseEntity.ok("Conta verificada com sucesso!")
+            : ResponseEntity.badRequest().body("Token inválido ou expirado.");
     }
 }
