@@ -12,7 +12,15 @@ API REST para organização financeira pessoal, desenvolvida com Java 17 e Sprin
 - Documentação interativa com Swagger UI
 
 ## Tecnologias
-Java 17 · Spring Boot 3.4.5 · Spring Security · JWT · Spring Data JPA · MariaDB · Maven · springdoc OpenAPI
+Java 17 · Spring Boot 3.4.5 · Spring Security · JWT · Spring Data JPA · PostgreSQL · Maven · springdoc OpenAPI
+
+## Banco de dados PostgreSQL (Neon ou local)
+
+O backend utiliza PostgreSQL. Para usar o Neon, copie os dados de conexão do projeto e configure a URL JDBC com SSL, por exemplo:
+
+`jdbc:postgresql://HOST:5432/DATABASE?sslmode=require`
+
+Não use diretamente uma URL no formato `postgres://...`; a aplicação espera uma URL JDBC `jdbc:postgresql://...`.
 
 ## Executar localmente
 1. Configure as variáveis de ambiente abaixo.
@@ -22,9 +30,9 @@ Java 17 · Spring Boot 3.4.5 · Spring Security · JWT · Spring Data JPA · Mar
 ## Variáveis de ambiente
 | Variável | Descrição |
 |---|---|
-| `DATABASE_URL` | JDBC URL do MariaDB |
-| `DATABASE_USERNAME` | Usuário do banco |
-| `DATABASE_PASSWORD` | Senha do banco |
+| `DATABASE_URL` | JDBC URL do PostgreSQL (Neon: inclua `?sslmode=require`) |
+| `DATABASE_USERNAME` | Usuário do PostgreSQL |
+| `DATABASE_PASSWORD` | Senha do PostgreSQL |
 | `APP_JWT_SECRET` | Segredo aleatório com pelo menos 32 bytes |
 | `APP_JWT_EXPIRATION_MS` | Validade do JWT em ms (padrão 24h) |
 | `MAIL_HOST`, `MAIL_PORT` | Servidor SMTP e porta |
