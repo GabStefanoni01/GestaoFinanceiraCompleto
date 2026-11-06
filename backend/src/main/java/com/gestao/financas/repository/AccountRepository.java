@@ -1,3 +1,3 @@
 package com.gestao.financas.repository;
-import com.gestao.financas.entity.Account;import org.springframework.data.jpa.repository.JpaRepository;import java.util.*;
-public interface AccountRepository extends JpaRepository<Account,Long>{List<Account> findByUser_Username(String username);Optional<Account> findByIdAndUser_Username(Long id,String username);}
+import com.gestao.financas.entity.Account;import com.gestao.financas.entity.User;import org.springframework.data.jpa.repository.JpaRepository;import java.util.*;
+public interface AccountRepository extends JpaRepository<Account,Long>{List<Account> findByUser_Username(String username);List<Account> findByUser(User user);Optional<Account> findByIdAndUser_Username(Long id,String username);}
