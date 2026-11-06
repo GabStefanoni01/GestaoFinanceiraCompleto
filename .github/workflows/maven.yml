@@ -20,4 +20,4 @@ jobs:
           cache: maven
       - name: Run tests
         working-directory: backend
-        run: ./mvnw --batch-mode clean verify
+        run: bash ./mvnw --batch-mode clean verify
