@@ -1,42 +1,9 @@
 package com.gestao.financas.controller;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import com.gestao.financas.model.Transacao;
-import com.gestao.financas.repository.TransacaoRepository;
-
-import java.util.List;
-
-@RestController
-@RequestMapping("/api/transacoes")
-public class TransacaoController {
-
-    @Autowired
-    private TransacaoRepository transacaoRepository;
-
-    @GetMapping
-    public List<Transacao> listarTransacoes() {
-        return transacaoRepository.findAll();
-    }
-
-    @PostMapping
-    public Transacao criarTransacao(@RequestBody Transacao transacao) {
-        return transacaoRepository.save(transacao);
-    }
-
-    @PutMapping("/{id}")
-    public Transacao atualizarTransacao(@PathVariable Long id, @RequestBody Transacao transacaoAtualizada) {
-        Transacao transacao = transacaoRepository.findById(id).orElseThrow();
-        transacao.setDescricao(transacaoAtualizada.getDescricao());
-        transacao.setValor(transacaoAtualizada.getValor());
-        transacao.setData(transacaoAtualizada.getData());
-        transacao.setTipo(transacaoAtualizada.getTipo());
-        return transacaoRepository.save(transacao);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deletarTransacao(@PathVariable Long id) {
-        transacaoRepository.deleteById(id);
-    }
+import com.gestao.financas.model.Transacao;import com.gestao.financas.repository.*;import io.swagger.v3.oas.annotations.security.SecurityRequirement;import jakarta.validation.Valid;import org.springframework.http.HttpStatus;import org.springframework.security.core.Authentication;import org.springframework.web.bind.annotation.*;import java.util.List;
+@RestController @RequestMapping("/api/transacoes") @SecurityRequirement(name="bearerAuth") public class TransacaoController {
+ private final TransacaoRepository transactions;private final UserRepository users;public TransacaoController(TransacaoRepository t,UserRepository u){transactions=t;users=u;}
+ @GetMapping public List<Transacao> list(Authentication auth){return transactions.findByUser_UsernameOrderByDataDesc(auth.getName());}
+ @PostMapping @ResponseStatus(HttpStatus.CREATED) public Transacao create(@Valid @RequestBody Transacao t,Authentication auth){t.setId(null);t.setUser(users.findByUsername(auth.getName()).orElseThrow(()->new IllegalArgumentException("Usuário não encontrado.")));return transactions.save(t);}
+ @PutMapping("/{id}") public Transacao update(@PathVariable Long id,@Valid @RequestBody Transacao input,Authentication auth){Transacao t=transactions.findByIdAndUser_Username(id,auth.getName()).orElseThrow(()->new IllegalArgumentException("Transação não encontrada."));t.setDescricao(input.getDescricao());t.setValor(input.getValor());t.setData(input.getData());t.setTipo(input.getTipo());return transactions.save(t);}
+ @DeleteMapping("/{id}") @ResponseStatus(HttpStatus.NO_CONTENT) public void delete(@PathVariable Long id,Authentication auth){transactions.delete(transactions.findByIdAndUser_Username(id,auth.getName()).orElseThrow(()->new IllegalArgumentException("Transação não encontrada.")));}
 }

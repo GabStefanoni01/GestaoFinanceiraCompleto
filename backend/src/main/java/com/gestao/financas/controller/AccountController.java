@@ -1,39 +1,9 @@
 package com.gestao.financas.controller;
-
-import com.gestao.financas.entity.Account;
-import com.gestao.financas.entity.User;
-import com.gestao.financas.service.AccountService;
-import com.gestao.financas.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
-import java.util.List;
-
-@RestController
-@RequestMapping("/accounts")
-public class AccountController {
-
-    @Autowired
-    private AccountService accountService;
-
-    @Autowired
-    private UserService userService; // Para associar conta ao usuário
-
-    @PostMapping("/create")
-    public ResponseEntity<Account> createAccount(@RequestBody @Valid Account account,
-                                                 @RequestParam Long userId) {
-        User user = userService.getUserById(userId);
-        account.setUser(user);
-        Account savedAccount = accountService.createAccount(account);
-        return ResponseEntity.ok(savedAccount);
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Account>> getAccountsByUser(@PathVariable Long userId) {
-        User user = userService.getUserById(userId);
-        List<Account> accounts = accountService.getAccountsByUser(user);
-        return ResponseEntity.ok(accounts);
-    }
+import com.gestao.financas.entity.Account;import com.gestao.financas.repository.*;import io.swagger.v3.oas.annotations.security.SecurityRequirement;import jakarta.validation.Valid;import org.springframework.http.HttpStatus;import org.springframework.security.core.Authentication;import org.springframework.web.bind.annotation.*;import java.util.List;
+@RestController @RequestMapping("/accounts") @SecurityRequirement(name="bearerAuth") public class AccountController {
+ private final AccountRepository accounts;private final UserRepository users;public AccountController(AccountRepository a,UserRepository u){accounts=a;users=u;}
+ @PostMapping @ResponseStatus(HttpStatus.CREATED) public Account create(@Valid @RequestBody Account a,Authentication auth){a.setId(null);a.setUser(users.findByUsername(auth.getName()).orElseThrow(()->new IllegalArgumentException("Usuário não encontrado.")));return accounts.save(a);}
+ @GetMapping public List<Account> list(Authentication auth){return accounts.findByUser_Username(auth.getName());}
+ @PutMapping("/{id}") public Account update(@PathVariable Long id,@Valid @RequestBody Account input,Authentication auth){Account a=accounts.findByIdAndUser_Username(id,auth.getName()).orElseThrow(()->new IllegalArgumentException("Conta não encontrada."));a.setName(input.getName());a.setType(input.getType());a.setBalance(input.getBalance());return accounts.save(a);}
+ @DeleteMapping("/{id}") @ResponseStatus(HttpStatus.NO_CONTENT) public void delete(@PathVariable Long id,Authentication auth){accounts.delete(accounts.findByIdAndUser_Username(id,auth.getName()).orElseThrow(()->new IllegalArgumentException("Conta não encontrada.")));}
 }

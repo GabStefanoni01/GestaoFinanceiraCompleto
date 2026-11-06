@@ -1,41 +1,9 @@
 package com.gestao.financas.controller;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import com.gestao.financas.model.Meta;
-import com.gestao.financas.repository.MetaRepository;
-
-import java.util.List;
-
-@RestController
-@RequestMapping("/api/metas")
-public class MetaController {
-
-    @Autowired
-    private MetaRepository metaRepository;
-
-    @GetMapping
-    public List<Meta> listarMetas() {
-        return metaRepository.findAll();
-    }
-
-    @PostMapping
-    public Meta criarMeta(@RequestBody Meta meta) {
-        return metaRepository.save(meta);
-    }
-
-    @PutMapping("/{id}")
-    public Meta atualizarMeta(@PathVariable Long id, @RequestBody Meta metaAtualizada) {
-        Meta meta = metaRepository.findById(id).orElseThrow();
-        meta.setDescricao(metaAtualizada.getDescricao());
-        meta.setValorObjetivo(metaAtualizada.getValorObjetivo());
-        meta.setValorAtual(metaAtualizada.getValorAtual());
-        return metaRepository.save(meta);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deletarMeta(@PathVariable Long id) {
-        metaRepository.deleteById(id);
-    }
+import com.gestao.financas.model.Meta;import com.gestao.financas.repository.*;import io.swagger.v3.oas.annotations.security.SecurityRequirement;import jakarta.validation.Valid;import org.springframework.http.HttpStatus;import org.springframework.security.core.Authentication;import org.springframework.web.bind.annotation.*;import java.util.List;
+@RestController @RequestMapping("/api/metas") @SecurityRequirement(name="bearerAuth") public class MetaController {
+ private final MetaRepository goals;private final UserRepository users;public MetaController(MetaRepository g,UserRepository u){goals=g;users=u;}
+ @GetMapping public List<Meta> list(Authentication auth){return goals.findByUser_Username(auth.getName());}
+ @PostMapping @ResponseStatus(HttpStatus.CREATED) public Meta create(@Valid @RequestBody Meta m,Authentication auth){m.setId(null);m.setUser(users.findByUsername(auth.getName()).orElseThrow(()->new IllegalArgumentException("Usuário não encontrado.")));return goals.save(m);}
+ @PutMapping("/{id}") public Meta update(@PathVariable Long id,@Valid @RequestBody Meta input,Authentication auth){Meta m=goals.findByIdAndUser_Username(id,auth.getName()).orElseThrow(()->new IllegalArgumentException("Meta não encontrada."));m.setDescricao(input.getDescricao());m.setValorObjetivo(input.getValorObjetivo());m.setValorAtual(input.getValorAtual());return goals.save(m);}
+ @DeleteMapping("/{id}") @ResponseStatus(HttpStatus.NO_CONTENT) public void delete(@PathVariable Long id,Authentication auth){goals.delete(goals.findByIdAndUser_Username(id,auth.getName()).orElseThrow(()->new IllegalArgumentException("Meta não encontrada.")));}
 }

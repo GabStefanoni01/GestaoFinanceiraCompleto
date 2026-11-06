@@ -1,65 +1,10 @@
 package com.gestao.financas.controller;
-
-import com.gestao.financas.dto.LoginDTO;
-import com.gestao.financas.entity.User;
-import com.gestao.financas.service.PasswordService;
-import com.gestao.financas.service.UserService;
-import com.gestao.financas.service.VerificationService;
-
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
-
-@RestController
-@RequestMapping("/auth")
-public class AuthController {
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private PasswordService passwordService;
-
-    @Autowired
-    private VerificationService verificationService; // ✅ injeta o serviço corretamente
-
-    @Autowired
-    private AuthenticationManager authManager;
-
-    @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody @Valid User user) {
-        return ResponseEntity.ok(userService.register(user));
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @Valid LoginDTO dto) {
-        Authentication auth = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword()));
-        return ResponseEntity.ok("Login efetuado com sucesso para: " + auth.getName());
-    }
-
-    @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
-        passwordService.createPasswordResetToken(email);
-        return ResponseEntity.ok("Email de redefinição enviado");
-    }
-
-    @PostMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestParam String token,
-                                                @RequestParam String newPassword) {
-        passwordService.resetPassword(token, newPassword);
-        return ResponseEntity.ok("Senha redefinida com sucesso");
-    }
-
-    @GetMapping("/verify")
-    public ResponseEntity<String> verifyEmail(@RequestParam String token) {
-        boolean ok = verificationService.verifyUser(token); // ✅ uso de instância
-        return ok
-            ? ResponseEntity.ok("Conta verificada com sucesso!")
-            : ResponseEntity.badRequest().body("Token inválido ou expirado.");
-    }
+import com.gestao.financas.dto.*;import com.gestao.financas.entity.User;import com.gestao.financas.security.JwtService;import com.gestao.financas.service.*;import jakarta.validation.Valid;import org.springframework.beans.factory.annotation.Value;import org.springframework.http.*;import org.springframework.security.authentication.*;import org.springframework.security.core.Authentication;import org.springframework.web.bind.annotation.*;import java.util.Map;
+@RestController @RequestMapping("/auth") public class AuthController {
+ private final UserService users;private final PasswordService passwords;private final AuthenticationManager manager;private final JwtService jwt;@Value("${app.jwt.expiration-ms:86400000}") private long expiration;
+ public AuthController(UserService u,PasswordService p,AuthenticationManager m,JwtService j){users=u;passwords=p;manager=m;jwt=j;}
+ @PostMapping("/register") public ResponseEntity<Map<String,Object>> register(@Valid @RequestBody RegisterRequest r){User u=new User();u.setUsername(r.username());u.setEmail(r.email());u.setPassword(r.password());users.register(u);return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message","Usuário cadastrado com sucesso.","username",u.getUsername()));}
+ @PostMapping("/login") public AuthResponse login(@Valid @RequestBody LoginDTO dto){Authentication a=manager.authenticate(new UsernamePasswordAuthenticationToken(dto.getUsername(),dto.getPassword()));return new AuthResponse(jwt.generateToken(a.getName()),"Bearer",expiration);}
+ @PostMapping("/forgot-password") public ResponseEntity<Map<String,String>> forgot(@RequestParam String email){passwords.createPasswordResetToken(email);return ResponseEntity.accepted().body(Map.of("message","Se o e-mail estiver cadastrado, as instruções serão enviadas."));}
+ @PostMapping("/reset-password") public ResponseEntity<Map<String,String>> reset(@RequestParam String token,@RequestParam String newPassword){passwords.resetPassword(token,newPassword);return ResponseEntity.ok(Map.of("message","Senha redefinida com sucesso."));}
 }
