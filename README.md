@@ -1,33 +1,49 @@
-# Sistema de Gestão Financeira Pessoal
+# Gestão Financeira Pessoal
 
-Este é um sistema de gestão financeira pessoal desenvolvido com **Spring Boot**, com foco em organização de receitas e despesas.
+API REST para organização financeira pessoal, desenvolvida com Java 17 e Spring Boot.
 
 ## Funcionalidades
+- Cadastro e login com JWT
+- Recuperação de senha por e-mail
+- Cadastro, consulta, edição e exclusão de contas
+- Gestão de receitas e despesas
+- Gestão de metas financeiras
+- Isolamento dos registros por usuário autenticado
+- Documentação interativa com Swagger UI
 
-- Cadastro de transações financeiras (receitas e despesas)
-- Listagem de todas as transações
-- Consulta de transação por ID
-- Atualização e exclusão de transações
-- Controle de saldo financeiro
-- API RESTful
+## Tecnologias
+Java 17 · Spring Boot 3.4.5 · Spring Security · JWT · Spring Data JPA · MariaDB · Maven · springdoc OpenAPI
 
-## Tecnologias utilizadas
+## Executar localmente
+1. Configure as variáveis de ambiente abaixo.
+2. Entre na pasta `backend`.
+3. Execute `./mvnw spring-boot:run` (Windows: `mvnw.cmd spring-boot:run`).
 
-- Java 17+
-- Spring Boot
-- Spring Data JPA
-- MariaDB
-- Maven
+## Variáveis de ambiente
+| Variável | Descrição |
+|---|---|
+| `DATABASE_URL` | JDBC URL do MariaDB |
+| `DATABASE_USERNAME` | Usuário do banco |
+| `DATABASE_PASSWORD` | Senha do banco |
+| `APP_JWT_SECRET` | Segredo aleatório com pelo menos 32 bytes |
+| `APP_JWT_EXPIRATION_MS` | Validade do JWT em ms (padrão 24h) |
+| `MAIL_HOST`, `MAIL_PORT` | Servidor SMTP e porta |
+| `MAIL_USERNAME`, `MAIL_PASSWORD` | Credenciais SMTP |
+| `APP_FRONTEND_BASE_URL` | URL da aplicação cliente |
 
-## Como executar
+Nunca versione senhas, tokens ou chaves. Como versões anteriores continham credenciais no arquivo de configuração, rotacione as credenciais expostas antes do deploy.
 
-1. Clone o repositório:
-2. Configure o banco de dados no application.properties:
-3. Compile e execute o projeto:
-4. Acesse a API:
+## Documentação
+Após iniciar a aplicação:
+- Swagger UI: `/swagger-ui/index.html`
+- OpenAPI JSON: `/v3/api-docs`
+- Health check: `/health`
 
-## 📬 Contato
+## Fluxo de teste no Swagger
+1. Faça cadastro em `POST /auth/register`.
+2. Faça login em `POST /auth/login`.
+3. Copie `accessToken` da resposta.
+4. Clique em **Authorize** e informe o token sem o prefixo `Bearer `.
+5. Teste contas, transações e metas. Os registros são vinculados ao usuário do token.
 
-Desenvolvido por Gabriel Stefanoni.  
-📧 [gabrielstefanoni00@gmail.com]  
-🔗 [LinkedIn](https://www.linkedin.com/in/gabriel-stefanoni-1674701b8/)
+As rotas financeiras exigem JWT. A API não aceita `userId` enviado pelo cliente para definir o proprietário de um registro.
